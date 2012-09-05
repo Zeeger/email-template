@@ -10,7 +10,7 @@ namespace VisualEmailTemplater.Controller
     {
         EmailTemplateModel model = new EmailTemplateModel();
 
-        public List<string> GetEmailTemplates()
+        public Dictionary<string,Template > GetEmailTemplates()
         {
             return model.EmailTemplates;
         }

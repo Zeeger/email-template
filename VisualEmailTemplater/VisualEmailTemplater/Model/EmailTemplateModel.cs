@@ -11,13 +11,13 @@ namespace VisualEmailTemplater.Model
 	{
 		TemplateManager templateManager = new TemplateManager();
 
-		List<string> _emailTemplates;
+		Dictionary<string,Template > _emailTemplates;
 
-		public List<string> EmailTemplates
+		public Dictionary<string, Template> EmailTemplates
 		{
 			get
 			{
-				return _emailTemplates = templateManager.FetchNames();
+				return _emailTemplates = templateManager.FetchTemplates();
 			}
 		}
 	}

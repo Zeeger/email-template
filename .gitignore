@@ -4,3 +4,5 @@ obj/
 *.suo
 *.swp
 *~
+*.cfg
+*.msg
