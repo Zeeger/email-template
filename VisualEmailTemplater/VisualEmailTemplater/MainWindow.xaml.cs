@@ -12,6 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using VisualEmailTemplater.Controller;
+using VisualEmailTemplater.Interfaces;
 
 namespace VisualEmailTemplater
 {
@@ -26,12 +27,12 @@ namespace VisualEmailTemplater
 		{
 			InitializeComponent();
 
-			foreach (var x in controller.GetEmailTemplates())
+			foreach (var x in controller.LoadedTemplates)
 			{
 				var cbi = new ComboBoxItem();
 
-				cbi.Content = x.Key;
-				cbi.Tag = x.Value;
+				cbi.Content = x.Name;
+				cbi.Tag = x;
 
 				cboTemplates.Items.Add(cbi);
 			}
@@ -47,7 +48,7 @@ namespace VisualEmailTemplater
 
 			if (senderTyped != null)
 			{
-				var template = (cboTemplates.SelectedItem as ComboBoxItem).Tag as Template;
+				var template = (cboTemplates.SelectedItem as ComboBoxItem).Tag as TemplatePreview;
 
 				if (template != null)
 				{
@@ -63,21 +64,27 @@ namespace VisualEmailTemplater
 
 			if (senderTyped != null)
 			{
-				var template = (senderTyped.SelectedItem as ComboBoxItem).Tag as Template;
+				var template = (senderTyped.SelectedItem as ComboBoxItem).Tag as IEmail;
 
 				if (template != null)
 				{ 
 					//txtTemplateOut.Text = ConvertListToString(template.StringDump);
 
+					var genericStringConcat = new GenericFunctions<string>();
+
+					txtTo.Text = genericStringConcat.ConcatenateList(template.Recipients, ";");
+
 					//txtTo.Text = template.Recipients ?? string.Empty;
 					txtSubject.Text = template.Subject ?? string.Empty;
 					txtBody.Text = template.Body ?? string.Empty;
 					//txtAttachment.Text = template.Attachments ?? string.Empty;
+
+					txtAttachment.Text = genericStringConcat.ConcatenateList(template.Attachments, ";");
 				}
 			}
 		}
 
-		private string ConvertListToString(List<string> input)
+		private string ConvertListToString(IList<TabControl> input)
 		{
 			var concat = string.Empty;
 

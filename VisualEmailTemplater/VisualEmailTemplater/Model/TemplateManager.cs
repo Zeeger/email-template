@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using VisualEmailTemplater.Interfaces;
 
 namespace VisualEmailTemplater.Model
 {
     class TemplateManager
     {
-		public Dictionary<string,Template> FetchTemplates()
+		public List<IEmail> FetchTemplates()
 		{
 			var configMgr = new ConfigManager();
 
@@ -16,7 +17,7 @@ namespace VisualEmailTemplater.Model
 			return ParseFileToTemplates(fileContents);
 		}
 
-		public Dictionary<string,Template > ParseFileToTemplates(List<string> fileContents)
+		public List<IEmail> ParseFileToTemplates(List<string> fileContents)
 		{
 			return TemplateParser.ParseConfig(fileContents);
 		}

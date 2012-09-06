@@ -55,8 +55,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Classes\Attachments.cs" />
+    <Compile Include="Classes\Recipients.cs" />
+    <Compile Include="Classes\Variables.cs" />
+    <Compile Include="GenericFunctions.cs" />
+    <Compile Include="Interfaces\IControlEmailTemplates.cs" />
+    <Compile Include="Classes\Email.cs" />
+    <Compile Include="Interfaces\IEmail.cs" />
     <Compile Include="OutlookInterop.cs" />
-    <Compile Include="Template.cs" />
+    <Compile Include="TemplatePreview.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

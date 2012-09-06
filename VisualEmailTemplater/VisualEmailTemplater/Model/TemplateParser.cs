@@ -2,100 +2,130 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using VisualEmailTemplater.Interfaces;
 
 namespace VisualEmailTemplater.Model
 {
 	class TemplateParser
 	{
-		internal static Dictionary<string, Template> ParseConfig(List<string> fileContents)
+		const string _TEMPLATE = "TEMPLATE";
+		const string _END = "END";
+		const string _TO = "TO";
+		const string _SUBJECT = "SUBJECT";
+		const string _BODY = "BODY";
+		const string _ATTACHMENT = "ATTACHMENT";
+
+		internal static List<IEmail> ParseConfig(List<string> fileContents)
 		{
-			var parsingDictionary = new Dictionary<string, Template>();
-
-			const string template = "TEMPLATE";
-			const string end = "END";
-			const string to = "TO";
-			const string subject = "SUBJECT";
-			const string body = "BODY";
-			const string attachment = "ATTACHMENT";
-
 			var currentProperty = string.Empty;
 
-			var currentStringList = new List<string>();
-			var currentTemplate = new Template();
+			var templateList = new List<IEmail>();
+			
+			var currentTemplate = new Email();
+			templateList.Add(currentTemplate);
 
 			//First, parse the template configurations out into individual groups
 			foreach (var line in fileContents)
 			{
+				currentProperty = DetermineCurrentProperty(currentProperty, line);
 
-				//We can only enter a template if we're not in anything
-				if (currentProperty == string.Empty && line.ToUpper().StartsWith(template))
+				string lineWithoutProperty = string.Empty;
+
+				if (line.ToUpper().StartsWith(currentProperty))
+					lineWithoutProperty = line.Substring(currentProperty.Length).Trim();
+				else
+					lineWithoutProperty = line;
+
+				switch (currentProperty)
 				{
-					currentProperty = template;
-					var templateName = line.Substring(template.Length).Trim();
-					
-					currentStringList = new List<string>();
-					
-					currentTemplate = new Template { StringDump=currentStringList };
+					case _TEMPLATE:
 
-					parsingDictionary.Add(templateName, currentTemplate);
-				}
-				else if (currentProperty == body)
-				{
-					if (line.ToUpper().StartsWith(end + body))
-					{
-						currentProperty = template;
-					}
-					else
-					{
-						if ((currentTemplate.Body ?? string.Empty).Length > 0) currentTemplate.Body += Environment.NewLine;
-						currentTemplate.Body += line;
-					}
-				}
-				else if (currentProperty == template)
-				{
-					//Check for start of properties
-					//	We can't start any property unless already in a template body
-
-					if (line.ToUpper().StartsWith(end + template))
-					{
-						currentProperty = string.Empty;
-					}
-					else
-					{
-						currentStringList.Add(line);
-
-						foreach (var x in new string[] { to, subject, body, attachment })
+						if (currentTemplate.Name != string.Empty)
 						{
-							if (line.ToUpper().StartsWith(x))
-							{
-								var lineContent = line.Substring(x.Length).TrimStart();
+							currentTemplate = new Email();
+							templateList.Add(currentTemplate);
+						}
 
-								switch (x)
-								{
-									case to:
-										currentTemplate.Recipients = lineContent.Replace(" ","").Split(';');
-										break;
-									case subject:
-										currentTemplate.Subject = lineContent.Trim();
-										break;
-									case attachment:
-										currentTemplate.Attachments = lineContent.Split(';');
-										break;
-									case body:
-										currentProperty = body;
-										currentTemplate.Body = lineContent.Trim();
-										break;
-								}
+						currentTemplate.Name = lineWithoutProperty;
+
+						break;
+
+					case _SUBJECT:
+						currentTemplate.Subject = lineWithoutProperty;
+
+						break;
+
+					case _BODY:
+
+						var templine = line;
+
+						if ((currentTemplate.Body ?? string.Empty) == string.Empty)
+						{
+							//Cut body from the beginning of the line
+							templine = lineWithoutProperty;
+						}
+						else
+						{
+							templine = Environment.NewLine + templine;
+						}
+
+						currentTemplate.Body += templine;
+
+						break;
+
+					case _TO:
+					case _ATTACHMENT:
+						foreach (var current in lineWithoutProperty.Split(';'))
+						{
+							var itemToAdd = current.Trim();
+
+							switch (currentProperty)
+							{
+								case _TO:
+									currentTemplate.Recipients.Add(itemToAdd);
+									break;
+								case _ATTACHMENT:
+									currentTemplate.Attachments.Add(itemToAdd);
+									break;
 							}
 						}
-					}
+
+						break;
+
+
 				}
-
-
 
 			}
 
-			return parsingDictionary;
+			return templateList;
+		}
+
+		private static string DetermineCurrentProperty(string currentProperty, string input)
+		{
+			
+			//We're in a property field. See if we change properties
+
+			// The only multiline, sub-template property is body. In this case, the only thing that exits body is endbody
+			if (currentProperty == _BODY)
+			{
+				if (!input.ToUpper().StartsWith(_END + _BODY))
+				{
+					return _BODY;
+				}
+			}
+
+			//We're allowed to enter a different property from any existing property other than body
+
+			foreach (var property in new string[] { _TEMPLATE, _TO, _SUBJECT, _BODY, _ATTACHMENT })
+			{
+				if (input.ToUpper().StartsWith(property))
+				{
+					return property;
+				}
+			}
+
+			//Default is to back out of a template
+			return string.Empty;
 		}
 	}
 }

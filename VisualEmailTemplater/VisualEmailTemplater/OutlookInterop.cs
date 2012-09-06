@@ -10,23 +10,7 @@ namespace VisualEmailTemplater
 	{
 		public static void SaveMessage(string[] recipients, string subject, string body, string[] attachments, string filepath)
 		{
-
-			//Application outLookApp = new Application();
-			//// Create a new TaskItem.
-			//MailItem newMail =
-			//  (MailItem)outLookApp.CreateItem(OlItemType.olMailItem);
-			//// Configure the task at hand and save it.
-			//newMail.Body = "Don't forget to send DOM the links...";
-			//newMail.Importance = OlImportance.olImportanceHigh;
-			//newMail.Subject = "Get DOM to stop bugging me.";
-			//newMail.Recipients.Add("emailaddress");
-
-
 			var curpwd = FileIO.PresentWorkingDirectory();
-
-			//newMail.Attachments.Add(curpwd + "myattachment.txt");
-
-			//newMail.SaveAs(FileIO.CombinePath(curpwd,"sample.msg"));
 
 			var outlookApplication = new Application();
 
