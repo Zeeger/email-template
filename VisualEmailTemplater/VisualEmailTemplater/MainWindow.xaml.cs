@@ -27,7 +27,7 @@ namespace VisualEmailTemplater
 		{
 			InitializeComponent();
 
-			foreach (var x in controller.LoadedTemplates)
+			foreach (var x in controller.GenerateEmail())
 			{
 				var cbi = new ComboBoxItem();
 

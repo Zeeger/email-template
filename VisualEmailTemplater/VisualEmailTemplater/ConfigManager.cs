@@ -14,7 +14,7 @@ namespace VisualEmailTemplater
 
 			foreach (var line in ReadConfigFileToStringList("variables.cfg"))
 			{
-				var cur = line.Split('=');
+				var cur = (line ?? string.Empty).Split('=');
 
 				if (cur.Count() > 1 && cur[0].StartsWith("%"))
 					varDict.Add(cur[0].Trim(), cur[1].Trim());

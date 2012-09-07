@@ -58,14 +58,14 @@ namespace VisualEmailTemplater.Controller
 
 			foreach (var email in generatedEmails)
 			{
-				email.Subject = FindAndReplaceVariablesInString(email.Subject);
-				email.Body = FindAndReplaceVariablesInString(email.Body);
+				email.Subject = FindAndReplaceVariablesInString(email.Subject, Variables);
+				email.Body = FindAndReplaceVariablesInString(email.Body, Variables);
 
 				var newRecipients = new Recipients();
 
 				foreach (var recipient in email.Recipients)
 				{
-					newRecipients.Add(FindAndReplaceVariablesInString(recipient));
+					newRecipients.Add(FindAndReplaceVariablesInString(recipient, Variables));
 				}
 
 				email.Recipients.Clear();
@@ -79,7 +79,7 @@ namespace VisualEmailTemplater.Controller
 
 				foreach (var attachment in email.Attachments)
 				{ 
-					newAttachments.Add(FindAndReplaceVariablesInString(attachment));
+					newAttachments.Add(FindAndReplaceVariablesInString(attachment, Variables));
 				}
 
 				email.Attachments.Clear();
@@ -92,9 +92,14 @@ namespace VisualEmailTemplater.Controller
 			return generatedEmails;
 		}
 
-		private string FindAndReplaceVariablesInString(string input)
+		private string FindAndReplaceVariablesInString(string input, Variables variables)
 		{
-			return input;
+			var output = input ?? string.Empty;
+			foreach (var variable in variables)
+			{
+				output = output.Replace(variable.Key, variable.Value);
+			}
+			return output;
 		}
 
 		public void SaveEmail(Email email, string filePath)

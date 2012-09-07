@@ -7,7 +7,7 @@ namespace VisualEmailTemplater
 {
 	class GenericFunctions<T>
 	{
-		public string ConcatenateList(IList<T> input, string delimiter)
+		public string ConcatenateList(IList<T> input, T delimiter)
 		{
 			var output = string.Empty;
 
@@ -16,7 +16,7 @@ namespace VisualEmailTemplater
 				output += item.ToString() + delimiter;
 			}
 
-			output = output.TrimEnd(delimiter.ToCharArray());
+			output = output.TrimEnd(delimiter.ToString().ToCharArray());
 
 			return output;
 		}
